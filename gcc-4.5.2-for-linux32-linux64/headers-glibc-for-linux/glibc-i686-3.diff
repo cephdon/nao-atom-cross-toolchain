@@ -1,0 +1,27 @@
+2007-05-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* sysdeps/unix/sysv/linux/i386/sysdep.h [__ASSEMBLER__]:
+	#undef __i686, to work around cpp problem with pentium2 and pentium3
+	reported by Clifford Wolf in
+	<http://lists.gnu.org/archive/html/bug-glibc/2003-01/msg00016.html>.
+
+Index: sysdeps/unix/sysv/linux/i386/sysdep.h
+===================================================================
+RCS file: /cvs/glibc/libc/sysdeps/unix/sysv/linux/i386/sysdep.h,v
+retrieving revision 1.68
+diff -p -u -r1.68 sysdep.h
+--- sysdeps/unix/sysv/linux/i386/sysdep.h	1 Feb 2007 16:13:17 -0000	1.68
++++ sysdeps/unix/sysv/linux/i386/sysdep.h	15 May 2007 13:32:59 -0000
+@@ -46,6 +46,12 @@
+ 
+ #ifdef __ASSEMBLER__
+ 
++/* __i686 appears in assembler as part of the __i686.get_pc_thunk.cx
++   label.  When optimizing for pentium2 or pentium3, gcc defines
++   __i686 as cpp macro which destroys label.  Glibc uses only the cpp
++   macro __i686__, so we can safely undefine __i686 here.  */
++#undef __i686
++
+ /* Linux uses a negative return value to indicate syscall errors,
+    unlike most Unices, which use the condition codes' carry flag.
+ 
