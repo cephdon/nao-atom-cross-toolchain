@@ -10,3 +10,5 @@ http://crossgcc.rts-software.org/doku.php
 
 Copyright:
   All code sources associated with this project are freely available under the GPLv3 license.
+
+Download Cross toolchain for Atom (NAO Next Gen) from http://robocup.aldebaran-robotics.com/

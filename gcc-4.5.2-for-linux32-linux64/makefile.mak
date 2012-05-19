@@ -70,20 +70,23 @@
 #    C R O S S    C O M P I L E R    T A R G E T                             *
 #                                                                            *
 #----------------------------------------------------------------------------*
-
-ifeq ($(THE_TARGET), linux32)
-  TARGET  := i586-pc-linux
-	TARGET_SUFFIX := linux32
-  BIT_SIZE := 32
-else
-  ifeq ($(THE_TARGET), linux64)
-    TARGET  := x86_64-pc-linux
-  	TARGET_SUFFIX := linux64
-	  BIT_SIZE := 64
-  else
-	  $(error Unknown target: $(THE_TARGET)
-	endif
-endif
+#
+#ifeq ($(THE_TARGET), linux32)
+#  TARGET  := i586-pc-linux
+#	TARGET_SUFFIX := linux32
+#  BIT_SIZE := 32
+#else
+#  ifeq ($(THE_TARGET), linux64)
+#    TARGET  := x86_64-pc-linux
+#  	TARGET_SUFFIX := linux64
+#	  BIT_SIZE := 64
+#  else
+#	  $(error Unknown target: $(THE_TARGET)
+#	endif
+#endif
+THE_TARGET := linux32
+TARGET := i686-pc-linux-gnu
+TARGET_SUFFIX := linux32
 
 #----------------------------------------------------------------------------*
 #                                                                            *
@@ -91,7 +94,7 @@ endif
 #                                                                            *
 #----------------------------------------------------------------------------*
 
-HOST    := i686-apple-darwin10
+HOST    := i686-apple-darwin11
 
 #----------------------------------------------------------------------------*
 #                                                                            *
@@ -102,10 +105,10 @@ HOST    := i686-apple-darwin10
 #--- Compiling for Mac OS X 10.4 does not work : binutils hangs.
 #--- Compiling for Mac OS X 10.5 does work.
 # If Mac OS X 10.5 SDK is not installed, you can use current (Mac OS X 10.6) SDK.
-APPLE_SDK := 10.5
+APPLE_SDK := 10.7
 # '-arch i386' ir required by gmp.
 # http://lists.apple.com/archives/Xcode-users/2007/Oct/msg00696.html
-export CC := gcc -arch i386 -isysroot /Developer/SDKs/MacOSX$(APPLE_SDK).sdk -mmacosx-version-min=$(APPLE_SDK)
+export CC := gcc -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$(APPLE_SDK).sdk -mmacosx-version-min=$(APPLE_SDK)
 
 #----------------------------------------------------------------------------*
 #                                                                            *
@@ -121,7 +124,7 @@ MAKE_J_OPTION := -j $(shell sysctl -n hw.ncpu)
 #                                                                            *
 #----------------------------------------------------------------------------*
 
-BINUTILS_VERSION  := 2.21
+BINUTILS_VERSION  := 2.21.1
 GCC_VERSION       := 4.5.2
 GMP_VERSION       := 5.0.1
 MPFR_VERSION      := 3.0.0
@@ -148,16 +151,18 @@ HEADERS_GLIBC_DISTRIBUTION := headers-glibc-$(TARGET_SUFFIX)
 #                                                                            *
 #----------------------------------------------------------------------------*
 
-ifndef SANDBOX
-  $(error the SANDBOX variable should be define to yes or no)
-endif
+TOOLCHAIN_DIRECTORY := /Users/yida/Projects/nao-cross-toolchain
+#ifndef SANDBOX
+#  $(error the SANDBOX variable should be define to yes or no)
+#endif
+SANDBOX := no
 
 ifeq ($(SANDBOX), yes)
   PRODUCT_DIRECTORY := $(shell pwd)/SANDBOX-$(TARGET_SUFFIX)
   SUDO :=
 else
   ifeq ($(SANDBOX), no)
-    PRODUCT_DIRECTORY := /usr/local/gcc-$(GCC_VERSION)-for-$(TARGET_SUFFIX)
+    PRODUCT_DIRECTORY := $(TOOLCHAIN_DIRECTORY)/cross/gcc-$(GCC_VERSION)-for-$(TARGET_SUFFIX)
     SUDO := sudo
   endif
 endif
@@ -244,6 +249,7 @@ BINUTILS_BUILD_PARAMETERS :=
 BINUTILS_BUILD_PARAMETERS += --target=$(TARGET)
 BINUTILS_BUILD_PARAMETERS += --build=$(HOST)
 BINUTILS_BUILD_PARAMETERS += --prefix=$(PRODUCT_DIRECTORY)
+BINUTILS_BUILD_PARAMETERS += --with-sysroot=$(TOOLCHAIN_DIRECTORY)/sysroot
 BINUTILS_BUILD_PARAMETERS += --disable-nls
 BINUTILS_BUILD_PARAMETERS += --disable-werror
 
@@ -349,6 +355,7 @@ GCC_BUILD_PARAMETERS :=
 GCC_BUILD_PARAMETERS += --target=$(TARGET)
 GCC_BUILD_PARAMETERS += --build=$(HOST)
 GCC_BUILD_PARAMETERS += --prefix=$(PRODUCT_DIRECTORY)
+GCC_BUILD_PARAMETERS += --with-sysroot=$(TOOLCHAIN_DIRECTORY)/sysroot
 GCC_BUILD_PARAMETERS += --with-gmp-include=$(CURRENT_DIRECTORY)/$(MAIN_BUILD_DIR)/$(BUILD_GMP)
 GCC_BUILD_PARAMETERS += --with-gmp-lib=$(CURRENT_DIRECTORY)/$(MAIN_BUILD_DIR)/$(BUILD_GMP)/.libs
 GCC_BUILD_PARAMETERS += --with-mpfr-include=$(CURRENT_DIRECTORY)/$(MAIN_BUILD_DIR)/$(MPFR_SOURCES)
