@@ -191,6 +191,7 @@ linux-% : | $(ARCHIVE_DIR)/linux-%.tar.bz2
 
 GLIBC_CONFIGURE_PARAMETERS :=
 GLIBC_CONFIGURE_PARAMETERS += --prefix=$(PRODUCT_DIRECTORY)
+GLIBC_CONFIGURE_PARAMETERS += --host=i686-pc-linux-gnu
 GLIBC_CONFIGURE_PARAMETERS += --disable-profile
 GLIBC_CONFIGURE_PARAMETERS += --enable-add-ons
 GLIBC_CONFIGURE_PARAMETERS += --with-headers=$(PRODUCT_DIRECTORY)/include
@@ -205,11 +206,13 @@ glibc-% : | $(ARCHIVE_DIR)/glibc-%.tar.gz
 	@echo "-------------------------------------- $@"
 #--- Remove directories
 	rm -fr $(GLIBC_BUILD_DIR)
-	rm -fr glibc-$(VERSION_GLIBC)
+	rm -fr glibc-$(GLIBC_VERSION)
 #--- Decompress archive
 	gunzip -c $(ARCHIVE_DIR)/$@.tar.gz > $@.tar
 	tar xf $@.tar
 	rm -f $@.tar
+#--- Apply Patch
+	cd glibc-$(GLIBC_VERSION) && patch -p1 < ../glibc-i686-3.diff
 #--- Configure
 	mkdir $(GLIBC_BUILD_DIR)
 	cd $(GLIBC_BUILD_DIR) && ../$@/configure --help
