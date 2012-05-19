@@ -116,8 +116,10 @@ GLIBC_CONFIGURE_PARAMETERS += --enable-add-ons
 #                                                                            *
 #----------------------------------------------------------------------------*
 
-BUILD_LIST := linux-2.6.38
-BUILD_LIST += glibc-2.11.1
+KERNEL_VERSION := 2.6.33.9-rt31
+GLIBC_VERSION := 2.11.3
+BUILD_LIST := linux-$(KERNEL_VERSION)
+BUILD_LIST += glibc-$(GLIBC_VERSION)
 
 #----------------------------------------------------------------------------*
 
@@ -244,7 +246,7 @@ CURL := curl --fail --location --output
 $(ARCHIVE_DIR)/linux-%.tar.bz2:
 	@echo "------------------ DOWNLOAD $(notdir $@)"
 	mkdir -p $(ARCHIVE_DIR)
-	$(CURL) $@ "http://www.kernel.org/pub/linux/kernel/v2.6/$(notdir $@)"
+#	$(CURL) $@ "http://www.kernel.org/pub/linux/kernel/v2.6/$(notdir $@)"
 
 #----------------------------------------------------------------------------*
 #                                                                            *
