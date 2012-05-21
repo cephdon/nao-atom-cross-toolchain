@@ -39,17 +39,18 @@
 #                                                                            *
 #----------------------------------------------------------------------------*
 
-PROCESSOR := $(shell uname -m)
-
-ifeq ($(PROCESSOR), x86_64)
-  MACHINE := 64
-else
-  ifeq ($(PROCESSOR), i686)
-    MACHINE := 32
-  else
-    $(error Unknown machine:$(PROCESSOR))
-  endif
-endif
+#PROCESSOR := $(shell uname -m)
+#
+#ifeq ($(PROCESSOR), x86_64)
+#  MACHINE := 64
+#else
+#  ifeq ($(PROCESSOR), i686)
+#    MACHINE := 32
+#  else
+#    $(error Unknown machine:$(PROCESSOR))
+#  endif
+#endif
+MACHINE := 32
 
 #----------------------------------------------------------------------------*
 #                                                                            *
@@ -117,9 +118,10 @@ GLIBC_CONFIGURE_PARAMETERS += --enable-add-ons
 #                                                                            *
 #----------------------------------------------------------------------------*
 
-KERNEL_VERSION := 2.6.33.9-rt31
+KERNEL_VERSION := 2.6.33.9
+PATCH_VERSION :=-rt31
 GLIBC_VERSION := 2.11.3
-BUILD_LIST := linux-$(KERNEL_VERSION)
+BUILD_LIST := linux-$(KERNEL_VERSION)$(PATCH_VERSION)
 BUILD_LIST += glibc-$(GLIBC_VERSION)
 
 #----------------------------------------------------------------------------*
@@ -212,7 +214,7 @@ glibc-% : | $(ARCHIVE_DIR)/glibc-%.tar.gz
 	tar xf $@.tar
 	rm -f $@.tar
 #--- Apply Patch
-	cd glibc-$(GLIBC_VERSION) && patch -p1 < ../glibc-i686-3.diff
+	cd glibc-$(GLIBC_VERSION) && patch  < ../glibc-i686-3.diff
 #--- Configure
 	mkdir $(GLIBC_BUILD_DIR)
 	cd $(GLIBC_BUILD_DIR) && ../$@/configure --help
@@ -250,7 +252,14 @@ CURL := curl --fail --location --output
 $(ARCHIVE_DIR)/linux-%.tar.bz2:
 	@echo "------------------ DOWNLOAD $(notdir $@)"
 	mkdir -p $(ARCHIVE_DIR)
-#	$(CURL) $@ "http://www.kernel.org/pub/linux/kernel/v2.6/$(notdir $@)"
+	$(CURL) $(ARCHIVE_DIR)/patch-$(KERNEL_VERSION)$(PATCH_VERSION).bz2 http://www.kernel.org/pub/linux/kernel/projects/rt/2.6.33/patch-$(KERNEL_VERSION)$(PATCH_VERSION).bz2
+	git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION)
+	cd $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION) && git checkout -f v$(KERNEL_VERSION)
+	cd $(ARCHIVE_DIR) && bzip2 -dv patch-$(KERNEL_VERSION)$(PATCH_VERSION).bz2
+	cd $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION) && patch -p1 < ../patch-$(KERNEL_VERSION)$(PATCH_VERSION)
+	cd $(ARCHIVE_DIR) && rm -rf linux-$(KERNEL_VERSION)$(PATCH_VERSION)/.git && tar -cvjf linux-$(KERNEL_VERSION)$(PATCH_VERSION).tar.bz2 linux-$(KERNEL_VERSION)$(PATCH_VERSION) 
+	rm -fr $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION)
+	rm -fr $(ARCHIVE_DIR)/patch-$(KERNEL_VERSION)$(PATCH_VERSION)
 
 #----------------------------------------------------------------------------*
 #                                                                            *
