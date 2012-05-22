@@ -165,11 +165,12 @@ linux-% : | $(ARCHIVE_DIR)/linux-%.tar.bz2
 	mkdir -p $(PRODUCT_DIRECTORY)/include
 #	cp -r /usr/include/* $(PRODUCT_DIRECTORY)/include
 #--- Decompress archive
-	bunzip2 -kc $(ARCHIVE_DIR)/$@.tar.bz2 > $(BUILD_LINUX_HEADERS_DIR)/$@.tar
+#	bunzip2 -kc $(ARCHIVE_DIR)/$@.tar.bz2 > $(BUILD_LINUX_HEADERS_DIR)/$@.tar
 #--- Untar
-	cd $(BUILD_LINUX_HEADERS_DIR) && tar xf $@.tar
+#	cd $(BUILD_LINUX_HEADERS_DIR) && tar xf $@.tar
+ 	mv $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION) $(BUILD_LINUX_HEADERS_DIR)
 #--- Remove tar file
-	rm -f $(BUILD_LINUX_HEADERS_DIR)/$@.tar
+#	rm -f $(BUILD_LINUX_HEADERS_DIR)/$@.tar
 #--- Install headers
 	cd $(BUILD_LINUX_HEADERS_DIR)/$@ && make headers_check
 	cd $(BUILD_LINUX_HEADERS_DIR)/$@ && make INSTALL_HDR_PATH=../header-dest headers_install
@@ -214,7 +215,7 @@ glibc-% : | $(ARCHIVE_DIR)/glibc-%.tar.gz
 	tar xf $@.tar
 	rm -f $@.tar
 #--- Apply Patch
-	cd glibc-$(GLIBC_VERSION) && patch  < ../glibc-i686-3.diff
+	cd glibc-$(GLIBC_VERSION) && patch sysdeps/unix/sysv/linux/i386/sysdep.h < ../glibc-i686-3.diff
 #--- Configure
 	mkdir $(GLIBC_BUILD_DIR)
 	cd $(GLIBC_BUILD_DIR) && ../$@/configure --help
@@ -257,8 +258,9 @@ $(ARCHIVE_DIR)/linux-%.tar.bz2:
 	cd $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION) && git checkout -f v$(KERNEL_VERSION)
 	cd $(ARCHIVE_DIR) && bzip2 -dv patch-$(KERNEL_VERSION)$(PATCH_VERSION).bz2
 	cd $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION) && patch -p1 < ../patch-$(KERNEL_VERSION)$(PATCH_VERSION)
-	cd $(ARCHIVE_DIR) && rm -rf linux-$(KERNEL_VERSION)$(PATCH_VERSION)/.git && tar -cvjf linux-$(KERNEL_VERSION)$(PATCH_VERSION).tar.bz2 linux-$(KERNEL_VERSION)$(PATCH_VERSION) 
-	rm -fr $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION)
+	cd $(ARCHIVE_DIR) && rm -rf linux-$(KERNEL_VERSION)$(PATCH_VERSION)/.git 
+#	tar -cvjf linux-$(KERNEL_VERSION)$(PATCH_VERSION).tar.bz2 linux-$(KERNEL_VERSION)$(PATCH_VERSION) 
+#	rm -fr $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION)
 	rm -fr $(ARCHIVE_DIR)/patch-$(KERNEL_VERSION)$(PATCH_VERSION)
 
 #----------------------------------------------------------------------------*
