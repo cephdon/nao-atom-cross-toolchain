@@ -100,7 +100,6 @@ MAKE_J_OPTION := -j $(shell cat /proc/cpuinfo | grep -i 'processor' | wc -l)
 
 GLIBC_CONFIGURE_PARAMETERS :=
 GLIBC_CONFIGURE_PARAMETERS += --prefix=$(PRODUCT_DIRECTORY)
-GLIBC_CONFIGURE_PARAMETERS += --host=i686-pc-linux-gnu
 GLIBC_CONFIGURE_PARAMETERS += --disable-profile
 GLIBC_CONFIGURE_PARAMETERS += --enable-add-ons
 
