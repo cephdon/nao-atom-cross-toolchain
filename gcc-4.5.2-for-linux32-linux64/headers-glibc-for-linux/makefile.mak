@@ -216,6 +216,7 @@ glibc-% : | $(ARCHIVE_DIR)/glibc-%.tar.gz
 	rm -f $@.tar
 #--- Apply Patch
 	cd glibc-$(GLIBC_VERSION) && patch sysdeps/unix/sysv/linux/i386/sysdep.h < ../glibc-i686-3.diff
+	cd glibc-$(GLIBC_VERSION) && patch nptl/sysdeps/pthread/pt-initfini.c < ../glibc-pt-initfini.diff
 #--- Configure
 	mkdir $(GLIBC_BUILD_DIR)
 	cd $(GLIBC_BUILD_DIR) && ../$@/configure --help
