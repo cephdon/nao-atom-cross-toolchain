@@ -168,7 +168,7 @@ linux-% : | $(ARCHIVE_DIR)/linux-%.tar.bz2
 #	bunzip2 -kc $(ARCHIVE_DIR)/$@.tar.bz2 > $(BUILD_LINUX_HEADERS_DIR)/$@.tar
 #--- Untar
 #	cd $(BUILD_LINUX_HEADERS_DIR) && tar xf $@.tar
- 	mv $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION) $(BUILD_LINUX_HEADERS_DIR)
+	cp -r $(ARCHIVE_DIR)/linux-$(KERNEL_VERSION)$(PATCH_VERSION) $(BUILD_LINUX_HEADERS_DIR)/.
 #--- Remove tar file
 #	rm -f $(BUILD_LINUX_HEADERS_DIR)/$@.tar
 #--- Install headers
